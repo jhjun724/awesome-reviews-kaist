@@ -170,9 +170,14 @@ Table 3는 TUM RGBD dataset[9]의 visual odometry 결과입니다. 해당 논문
 
 ## 5. Appendix
 
-Visual odometry 혹은 SLAM에 익숙하지 않은 분들은 제안되는 방법에서 사용된 8-point algorithm과 RANSAC이 생소할 것 같아 해당 부분을 추가하였습니다.
+Visual odometry 혹은 SLAM에 익숙하지 않은 분들은 제안되는 방법에서 사용된 8-point algorithm과 RANSAC이 생소할 것 같아 간단한 설명을 추가하였습니다.
 
 ### 8-point Algorithm
+
+![Figure 7. Epipolar constraint (image from M. Pollefeys)](../../.gitbook/assets/53/epipolar_constraint.png)
+
+8-point algorithm에 대해 알기 위해선 먼저 epipolar의 개념이 필요합니다. Figure 7에서 3D점 P에 대해서 카메라의 중심 O와 이루는 직선(광선)이 이미지 평면 $$\Phi$$에 투영되며 그에 대한 결과인 2D점 p가 하나의 픽셀을 차지하게 되고 다른 이미지에 대해서도 마찬가지입니다. 이 때 직선(광선) $$\overrightarrow(Op)$$를 이미지 평면 $$\Phi'$$ 위에 투영시켰을 때, $$Phi'$$에 대해 P와 대응하는 p'은 투영된 직선 위에 있게되며, 반대의 경우도 마찬가지입니다. 그리고 이를 epipolar constraint라 합니다. 이러한 epipolar constraint를 기반으로 우리는 하나의 식을 세울수 있습니다.
+$$\overrightarrow(Op) \dot [\overrightarrow(OO') \times \overrightarrow(O'p')]$$
 
 ### Random Sample Consensus (RANSAC)
 
