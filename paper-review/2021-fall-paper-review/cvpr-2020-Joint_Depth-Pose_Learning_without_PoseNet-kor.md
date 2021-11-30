@@ -48,6 +48,8 @@ Description: Zhao et al. / Towards Better Generalzation Joint Depth-Pose Learnin
 
 ## 3. Method
 
+해당 시스템의 목적은 두 장의 연속적인 이미지를 입력으로 넣어주어, 두 이미지(카메라) 간의 상대 pose(rotation+translation)를 구하며, 이러한 상대 pose를 누적함으로써 카메라 혹은 카메라가 장착된 자동차의 전체 경로를 추정하는 것입니다.
+
 ### 3.1 Overall System Architecture
 
 ![Figure 2. Overall architecture](../../.gitbook/assets/53/architecture.png)
@@ -146,17 +148,19 @@ $$D^a_b$$는 depth map $$D_a$$가 $$T_{ab}$$를 통해 재투영된 depth map입
 
 ### Result
 
-![Table 1. Quantitative comparison](../../.gitbook/assets/53/quantitative_result.png)
+![Table 1. Quantitative comparison of depth-pose learning methods on KITTI dataset](../../.gitbook/assets/53/quantitative_result.png)
 
 Table 1은 state-of-the-art depth pose learning과 논문에서 제안된 방법의 KITTI dataset에서의 결과에 대한 비교표입니다.
 
-![Figure 5. Visual odometry results on sequence 09 and 10](../../.gitbook/assets/53/vo_result.png)
+![Figure 5. Visual odometry results on sequence 09 and 10 of KITTI odometry](../../.gitbook/assets/53/vo_result.png)
 
-KITTI Odometry dataset의 sequence 09와 10의 visual odometry 결과입니다. 첫번째와 세번째는 sequnece 09와 10에 대해서 논문에서 제안된 방법과 ORB-SLAM2를 비교한 결과이며 두번째와 네번째는 state-of-the-art depth-pose learning과 비교한 결과입니다. ORB-SLAM2는 딥러닝이 전혀 들어가지 않은 기법입니다.
+KITTI Odometry dataset의 sequence 09와 10의 visual odometry 결과입니다. 위의 결과는 카메라의 경로를 시각화한 것입니다. 첫번째와 세번째는 sequnece 09와 10에 대해서 논문에서 제안된 방법과 ORB-SLAM2를 비교한 결과이며 두번째와 네번째는 state-of-the-art depth-pose learning과 비교한 결과입니다. ORB-SLAM2는 딥러닝이 전혀 들어가지 않은 기법입니다.
 
-![Table 2. Quantitative comparison of visual odometry](../../.gitbook/assets/53/vo_table.png)
+![Table 2. Quantitative comparison of visual odometry on KITTI dataset](../../.gitbook/assets/53/vo_table.png)
  
 Figure 5에 대한 정량적인 평가표입니다.
+
+![Table 3. Quantitative comparison of visual odometry on TUM RGBD dataset](../../.gitbook/assets/53/TUM-RGBD_quantitative_result.png)
 
 ![Figure 6. Depth estimation results on NYUv2 test data](../../.gitbook/assets/53/NYUv2_test.png)
 
