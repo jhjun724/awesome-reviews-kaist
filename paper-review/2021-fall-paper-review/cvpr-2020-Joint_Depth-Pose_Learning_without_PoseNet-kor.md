@@ -28,7 +28,7 @@ Description: Zhao et al. / Towards Better Generalzation Joint Depth-Pose Learnin
 
 #### Self-Supervised Depth-Pose Learning
 
-최근 SfM 관련 연구에서는 neural network를 접목시켜 카메라의 pose를 추측하는 네트워크들이 많이 개발되었습니다. 이 때 단안카메라의 경우 카메라의 pose를 학습시키더라도 깊이(depth) 정보가 없기 때문에 scale에 대한 문제가 발생하게 됩니다. 즉 100% 정확한 pose가 아니게 됩니다. 이러한 문제를 depth를 추측하는 네트워크와 pose를 추측하는 네트워크를 동시에 학습시키는 연구들이 진행되었습니다. photometric error를 통해 depth와 ego-motion 네트워크를 결합하여 학습시키거나, ICP regularization 혹은 dense online bundle adjustment를 통해 학습 전략을 더 심도 깊게 만드는 연구들이 있었습니다.
+최근 SfM 관련 연구에서는 neural network를 접목시켜 카메라의 pose를 추측하는 네트워크들이 많이 개발되었습니다. 이 때 단안카메라의 경우 카메라의 pose를 학습시키더라도 깊이(depth) 정보가 없기 때문에 scale에 대한 문제가 발생하게 됩니다. 즉 100% 정확한 pose가 아니게 됩니다. 이러한 문제를 depth를 추측하는 네트워크와 pose를 추측하는 네트워크를 동시에 학습시키는 연구들이 진행되었습니다. photometric error를 통해 depth와 ego-motion 네트워크를 결합하여 학습시키거나, ICP regularization[10] 혹은 dense online bundle adjustment[11, 12]를 통해 학습 전략을 더 심도 깊게 만드는 연구들이 있었습니다.
 
 #### Two-view Geometry
 
@@ -36,7 +36,7 @@ Description: Zhao et al. / Towards Better Generalzation Joint Depth-Pose Learnin
 
 최근에는 딥러닝을 기반의 feature point를 추출하는 혹은 매칭하는 연구가 많이 진행되었으며, phtometric consistency를 통해 학습하는 딥러닝 기반의 optical flow 연구도 많이 진행되고 있습니다.
 
-이렇게 전통적인 방법으로는 수백 혹은 수천개의 correspondence가 구성되면 8-point algorithm 등과 RANSAC 기법들을 결합하여 오차가 가장 적은 pose transformation을 구하게 됩니다. 하지만 위의 모든 과정들을 PoseNet과 같은 하나의 네트워크로 수행될 수 있습니다. 즉 두 개의 이미지를 입력으로 넣어주면 하나의 end-to-end 네트워크를 거쳐 두 이미지를 촬영한 카메라의 relative pose를 구할 수 있습니다. 하지만 앞서 말했듯 단안카메라로는 scale inconsistency 문제가 남아 있습니다.
+이렇게 전통적인 방법으로는 수백 혹은 수천개의 correspondence가 구성되면 8-point algorithm 등과 RANSAC 기법들을 결합하여 오차가 가장 적은 pose transformation을 구하게 됩니다. 하지만 위의 모든 과정들을 PoseNet[5]과 같은 하나의 네트워크로 수행될 수 있습니다. 즉 두 개의 이미지를 입력으로 넣어주면 하나의 end-to-end 네트워크를 거쳐 두 이미지를 촬영한 카메라의 relative pose를 구할 수 있습니다. 하지만 앞서 말했듯 단안카메라로는 scale inconsistency 문제가 남아 있습니다.
 
 ### Idea
 
@@ -84,7 +84,7 @@ $$x^*=\argmin_x[d(L_1,x)]^2+[d(L_2,x)]^2$$
 
 마지막으로 Triangulation까지 거쳐 계산된 sparse depth와 DepthNet을 통해 예측된 dense depth를 align 함으로써 scale-invariante한 결과를 구하게 됩니다.
 
-### 3.2 Loss function
+### 3.2 Loss Function
 
 네트워크에서는 총 4가지의 loss를 계산합니다. 첫번째 loss는 optical flow에 대한 loss, $$L_f$$입니다. Optical flow를 수행하는 네트워크의 결과에 대해 PWCNet에서 제안한 loss(pixel+SSIM+smoothness)를 사용합니다. 두번째는 depth에 대한 loss $$L_d$$입니다. 두 이미지의 relative pose를 알 때 우리는 triangulation을 통해 correspondence의 depth를 추정할 수 있습니다. 이렇게 추정된 triangulation을 통한 depth와 네트워크를 통해 예측된 depth를 비교하여 loss를 구합니다. 세번째 loss는 reprojection error에 대한 loss $$L_p$$입니다. Optical flow를 통해 구한 correspondence로 두 이미지의 relative pose를 구하고 relative pose를 통해 두 이미지의 reprojection error를 계산합니다. 즉 두 카메라 간의 relative pose가 얼마나 정확한지에 대한 loss입니다. 마지막 네번째 loss는 depth smoothness loss $$L_s$$입니다. 이는 한 물체에 대해 depth를 측정한다면 대부분의 물체는 평면 혹은 곡면으로 이루어져 있기 때문에 depth 값이 갑자기 변하는 부분에 대한 처리를 위한 loss입니다.
 
@@ -132,15 +132,15 @@ $$D^a_b$$는 depth map $$D_a$$가 $$T_{ab}$$를 통해 재투영된 depth map입
 
 ## 4. Experiment & Result
 
-### Experimental setup
+### Experimental Setup
 
 **Dataset**
 
-실외의 large-scale의 환경에 대해서는 KITTI Odometry dataset에서 수행되었으며, 실내 환경은 NYUv2와 TUM-RGBD에서 수행되었습니다. KITTI dataset의 경우 이미지를 832x256 크기로 resize 하였으며, 00-08 sequence들을 training set으로  09-10 sequence들을 test set으로 사용하였습니다. 실내 데이터의 경우 이미지의 texture가 적고 카메라 모션이 복잡한 상황에 보다 집중했습니다.
+실외의 large-scale의 환경에 대해서는 KITTI Odometry dataset[7]에서 수행되었으며, 실내 환경은 NYUv2와 TUM-RGBD에서 수행되었습니다. KITTI dataset[7]의 경우 이미지를 832x256 크기로 resize 하였으며, 00-08 sequence들을 training set으로  09-10 sequence들을 test set으로 사용하였습니다. 실내 데이터의 경우 이미지의 texture가 적고 카메라 모션이 복잡한 상황에 보다 집중했습니다.
 
 **Network architecture**
 
-네트워크는 depth prediction을 위한 DepthNet과 optical flow prediction을 위한 FlowNet이 사용되었습니다. DepthNet의 경우 ResNet18이 encoder로 DispNet이 decoder로 적용되었습니다. FlowNet의 경우 PWCNet을 기본으로 하며, occlusion 또한 고려를 합니다.
+네트워크는 depth prediction을 위한 DepthNet과 optical flow prediction을 위한 FlowNet이 사용되었습니다.  DepthNet의 경우 Godard et al.[3]에 기반하여 ResNet18이 encoder로 DispNet[7]이 decoder로 적용되었습니다. FlowNet의 경우 PWC-Net[4]을 기본으로 하며, Wang et al.[6] occlusion 또한 고려를 합니다.
 
 **Training**
 
@@ -150,11 +150,11 @@ $$D^a_b$$는 depth map $$D_a$$가 $$T_{ab}$$를 통해 재투영된 depth map입
 
 ![Table 1. Quantitative comparison of depth-pose learning methods on KITTI dataset](../../.gitbook/assets/53/quantitative_result.png)
 
-Table 1은 state-of-the-art depth pose learning과 논문에서 제안된 방법의 KITTI dataset에서의 결과에 대한 비교표입니다.
+Table 1은 state-of-the-art depth pose learning과 논문에서 제안된 방법의 KITTI dataset[7]에서의 결과에 대한 비교표입니다.
 
 ![Figure 5. Visual odometry results on sequence 09 and 10 of KITTI odometry](../../.gitbook/assets/53/vo_result.png)
 
-KITTI Odometry dataset의 sequence 09와 10의 visual odometry 결과입니다. 위의 결과는 카메라의 경로를 시각화한 것입니다. 첫번째와 세번째는 sequnece 09와 10에 대해서 논문에서 제안된 방법과 ORB-SLAM2를 비교한 결과이며 두번째와 네번째는 state-of-the-art depth-pose learning과 비교한 결과입니다. ORB-SLAM2는 딥러닝이 전혀 들어가지 않은 기법입니다.
+KITTI Odometry dataset[7]의 sequence 09와 10의 visual odometry 결과입니다. 위의 결과는 카메라의 경로를 시각화한 것입니다. 첫번째와 세번째는 sequnece 09와 10에 대해서 논문에서 제안된 방법과 ORB-SLAM2를 비교한 결과이며 두번째와 네번째는 state-of-the-art depth-pose learning과 비교한 결과입니다. ORB-SLAM2는 딥러닝이 전혀 들어가지 않은 기법입니다.
 
 ![Table 2. Quantitative comparison of visual odometry on KITTI dataset](../../.gitbook/assets/53/vo_table.png)
  
@@ -162,13 +162,23 @@ Figure 5에 대한 정량적인 평가표입니다.
 
 ![Table 3. Quantitative comparison of visual odometry on TUM RGBD dataset](../../.gitbook/assets/53/TUM-RGBD_quantitative_result.png)
 
+Table 3는 TUM RGBD dataset[9]의 visual odometry 결과입니다. 해당 논문은 PoseNet[5]에 전적으로 의지하는 대신 optical flow를 추정하는 FlowNet과 geometry에 기반한 방법을 제시하였으며 위의 표가 이에 대한 비교를 가장 잘 보여주는 결과입니다.
+
 ![Figure 6. Depth estimation results on NYUv2 test data](../../.gitbook/assets/53/NYUv2_test.png)
 
-뿐만 아니라 논문에서 제안하는 방법은 generalization 관점에서도 좋은 성능을 보이고 있습니다. Figure 6는 indoor dataset인 NYUv2에서 test위에서부터 입력 이미지, PoseNet을 baseline으로 하는 depth 예측, 제안된 방법에 의한 depth 예측, 그리고 groundtruth 순서입니다.
+뿐만 아니라 논문에서 제안하는 방법은 generalization 관점에서도 좋은 성능을 보이고 있습니다. Figure 6는 indoor dataset인 NYUv2에서 test위에서부터 입력 이미지, PoseNet[5]을 baseline으로 하는 depth 예측, 제안된 방법에 의한 depth 예측, 그리고 groundtruth 순서입니다.
 
-## 5. Conclusion
+## 5. Appendix
 
-논문에서는 새로운 _self-supervised joint depth-pose learning_ 제안했습니다. 그들의 핵심 아이디어는 PoseNet과 같은 네트워크를 통해서 relative pose를 구하는 것이 아니라, optical flow로 correspondence를 구성하고 geometry에 기반하여 relative pose를 구합니다. 이후 triangulation을 통해 추정한 depth와 네트워크를 통해 예측된 depth를 align함으로써 scale inconsistency 문제를 해결했습니다. 이러한 구조를 통해 정확성 뿐만 아니라 네트워크 기반의 방법이 겪을 수 있는 generalization 문제를 보완하였으며, relative pose를 구하는 과정이 geometry에 기반했기 때문에 pose optimization이나 bundle adjustment 같은 back-end optimization
+Visual odometry 혹은 SLAM에 익숙하지 않은 분들은 제안되는 방법에서 사용된 8-point algorithm과 RANSAC이 생소할 것 같아 해당 부분을 추가하였습니다.
+
+### 8-point Algorithm
+
+### Random Sample Consensus (RANSAC)
+
+## 6. Conclusion
+
+논문에서는 새로운 _self-supervised joint depth-pose learning_ 제안했습니다. 그들의 핵심 아이디어는 PoseNet[5]과 같은 네트워크를 통해서 relative pose를 구하는 것이 아니라, optical flow로 correspondence를 구성하고 geometry에 기반하여 relative pose를 구합니다. 이후 triangulation을 통해 추정한 depth와 네트워크를 통해 예측된 depth를 align함으로써 scale inconsistency 문제를 해결했습니다. 이러한 구조를 통해 정확성 뿐만 아니라 네트워크 기반의 방법이 겪을 수 있는 generalization 문제를 보완하였으며, relative pose를 구하는 과정이 geometry에 기반했기 때문에 pose optimization이나 bundle adjustment 같은 back-end optimization
 
 ### Take home message \(오늘의 교훈\)
 
@@ -193,9 +203,14 @@ Figure 5에 대한 정량적인 평가표입니다.
 
 1. [Wang Zhao, Shaohui Liu, Yezhi Shu, and Yong-Jin Liu. Towards Better Generalization: Joint Depth-Pose Learning without PoseNet. In _CVPR_, 2020.](https://arxiv.org/abs/2004.01314)  
 2. https://github.com/B1ueber2y/TrianFlow  
-3. [Cl´ement Godard, Oisin Mac Aodha, Michael Firman, and Gabriel J Brostow. Digging Into Self-Supervised Monocular Depth Estimation. In _CVPR_, 2019.](https://arxiv.org/abs/1806.01260)  
-   [Deqing Sun, Xiaodong Yang, Ming-Yu Liu, and Jan Kautz. PWC-Net: CNNs for Optical Flow Using Pyramid, Warping, and Cost Volume. In _CVPR_, 2018.](https://arxiv.org/abs/1709.02371)  
-   [Alex Kendall, Matthew Grimes, and Roberto Cipolla. PoseNet: A Convolutional Network for Real-Time 6-DOF Camera Relocalization. In _ICCV_, 2015.](https://arxiv.org/abs/1505.07427)  
-   [Yang Wang, Yi Yang, Zhenheng Yang, Liang Zhao, Peng Wang, and Wei Xu. Occlusion Aware Unsupervised Learning of Optical Flow
-. In _CVPR_, 2018.](https://arxiv.org/abs/1711.05890)  
-   [Andreas Geiger, Philip Lenz, and Raquel Urtasun. Are we ready for autonomous driving? the kitti vision benchmark suite. In _CVPR_, 2012.](http://www.cvlibs.net/publications/Geiger2012CVPR.pdf)  
+3. [Cl´ement Godard, Oisin Mac Aodha, Michael Firman, and Gabriel J Brostow. Digging Into Self-Supervised Monocular Depth Estimation. In _CVPR_, 2019.](https://arxiv.org/abs/1806.01260)
+4. [Deqing Sun, Xiaodong Yang, Ming-Yu Liu, and Jan Kautz. PWC-Net: CNNs for Optical Flow Using Pyramid, Warping, and Cost Volume. In _CVPR_, 2018.](https://arxiv.org/abs/1709.02371)  
+5. [Alex Kendall, Matthew Grimes, and Roberto Cipolla. PoseNet: A Convolutional Network for Real-Time 6-DOF Camera Relocalization. In _ICCV_, 2015.](https://arxiv.org/abs/1505.07427)  
+6. [Yang Wang, Yi Yang, Zhenheng Yang, Liang Zhao, Peng Wang, and Wei Xu. Occlusion Aware Unsupervised Learning of Optical Flow
+. In _CVPR_, 2018.](https://arxiv.org/abs/1711.05890)
+7. [Andreas Geiger, Philip Lenz, and Raquel Urtasun. Are we ready for autonomous driving? the kitti vision benchmark suite. In _CVPR_, 2012.](http://www.cvlibs.net/publications/Geiger2012CVPR.pdf)  
+8. [Cl´ement Godard, Oisin Mac Aodha, and Gabriel J Bros- tow. Unsupervised Monocular Depth Estimation with Left-Right Consistency. In _CVPR_, 2017](https://openaccess.thecvf.com/content_cvpr_2017/papers/Godard_Unsupervised_Monocular_Depth_CVPR_2017_paper.pdf)
+9. [J¨urgen Sturm, Nikolas Engelhard, Felix Endres, Wolfram Burgard, and Daniel Cremers. A Benchmark for the Evaluation of RGB-D SLAM Systems. In _IROS_, 2012](https://ieeexplore.ieee.org/document/6385773)
+10. [Reza Mahjourian, Martin Wicke, and Anelia Angelova. Unsupervised Learning of Depth and Ego-Motion from Monocular Video Using 3D Geometric Constraints. In _CVPR_, 2018](https://openaccess.thecvf.com/content_cvpr_2018/papers/Mahjourian_Unsupervised_Learning_of_CVPR_2018_paper.pdf)
+11. [Vincent Casser, Soeren Pirk, Reza Mahjourian, and Anelia Angelova. Depth Prediction Without the Sensors: Leveraging Structure for Unsupervised Learning from Monocular Videos. In _AAAI_, 2019](https://arxiv.org/abs/1811.06152)
+12. [Yuhua Chen, Cordelia Schmid, and Cristian Sminchisescu. Self-supervised Learning with Geometric Constraints in Monocular Video: Connecting Flow, Depth, and Camera. In _ICCV_, 2019](https://arxiv.org/abs/1907.05820)
